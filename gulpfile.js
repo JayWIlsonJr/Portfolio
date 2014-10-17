@@ -1,5 +1,5 @@
 'use strict';
-// generated on 2014-10-13 using generator-gulp-webapp 0.1.0
+// generated on 2014-10-17 using generator-gulp-webapp 0.1.0
 
 var gulp = require('gulp');
 
@@ -17,14 +17,14 @@ gulp.task('styles', function () {
         .pipe($.size());
 });
 
-gulp.task('js', function () {
-    return gulp.src('app/js/**/*.js')
+gulp.task('scripts', function () {
+    return gulp.src('app/scripts/**/*.js')
         .pipe($.jshint())
         .pipe($.jshint.reporter(require('jshint-stylish')))
         .pipe($.size());
 });
 
-gulp.task('html', ['styles', 'js'], function () {
+gulp.task('html', ['styles', 'scripts'], function () {
     var jsFilter = $.filter('**/*.js');
     var cssFilter = $.filter('**/*.css');
 
@@ -70,9 +70,7 @@ gulp.task('clean', function () {
     return gulp.src(['.tmp', 'dist'], { read: false }).pipe($.clean());
 });
 
-gulp.task('build', ['html', 'templates', 'images', 'extras'], function () {
-  return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
-});
+gulp.task('build', ['html', 'images', 'fonts', 'extras']);
 
 gulp.task('default', ['clean'], function () {
     gulp.start('build');
@@ -93,7 +91,7 @@ gulp.task('connect', function () {
         });
 });
 
-gulp.task('serve', ['connect', 'templates', 'styles'], function () {
+gulp.task('serve', ['connect', 'styles'], function () {
     require('opn')('http://localhost:9000');
 });
 
@@ -114,15 +112,6 @@ gulp.task('wiredep', function () {
         .pipe(gulp.dest('app'));
 });
 
-gulp.task('templates', function () {
-  return gulp.src('app/templates/**/*.hbs')
-    .pipe($.emberHandlebars({
-      outputType: 'browser'
-     }))
-    .pipe(gulp.dest('.tmp/templates'));
-});
-
-// Jakes Gulp task for watching external Ember templates
 gulp.task('watch', ['connect', 'serve'], function () {
     var server = $.livereload();
 
@@ -131,16 +120,15 @@ gulp.task('watch', ['connect', 'serve'], function () {
     gulp.watch([
         'app/*.html',
         '.tmp/styles/**/*.css',
-        'app/js/**/*.js',
-        'app/images/**/*',
-        'app/templates/**/*.hbs'
+        'app/scripts/**/*.js',
+        'app/images/**/*'
     ]).on('change', function (file) {
         server.changed(file.path);
     });
 
-    gulp.watch('app/templates/*.hbs', ['templates']);
+    gulp.watch('app/bower_components/**/*.scss', ['styles']);
     gulp.watch('app/styles/**/*.scss', ['styles']);
-    gulp.watch('app/js/**/*.js', ['js']);
+    gulp.watch('app/scripts/**/*.js', ['scripts']);
     gulp.watch('app/images/**/*', ['images']);
     gulp.watch('bower.json', ['wiredep']);
 });
